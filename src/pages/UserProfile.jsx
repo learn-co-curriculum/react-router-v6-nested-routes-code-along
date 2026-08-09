@@ -1,25 +1,26 @@
-import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import { useOutletContext, useParams } from "react-router-dom"
 
 function UserProfile() {
-  const [user, setUser] = useState({})
-  const params = useParams()
-  const userId = params.id
+  const { id } = useParams();
+  const users = useOutletContext() ?? [];
 
-  useEffect(() =>{
-    fetch(`http://localhost:4000/users/${userId}`)
-    .then(r => {
-      if (!r.ok) { throw new Error("Failed to get user information") }
-      return r.json()
-    })
-    .then(data => setUser(data))
-    .catch(error => console.error(error))
-  }, [userId])
+  console.log("UserProfile params", { id }, "users", users)
 
-  return(  
+  if (users.length === 0) {
+    return (
       <aside>
-        { user.name ? <h1>{user.name}</h1> : <h1>Loading...</h1> }
+        <h1>Loading...</h1>
       </aside>
+    )
+  }
+
+  const user = users.find(user => String(user.id) === String(id))
+  console.log("matched user", user)
+
+  return (
+    <aside>
+      {user ? <h1>{user.name}</h1> : <h1>User not found</h1>}
+    </aside>
   )
 }
 
